@@ -1,0 +1,152 @@
+{
+  "id": "application-process",
+  "name": "Bewerbungsprozess",
+  "description": "Bewerbung erfassen, prüfen, Gespräch führen und entscheiden",
+  "icon": "📋",
+  "roles": [
+    "hr",
+    "manager",
+    "admin"
+  ],
+  "form": {
+    "hint": "Neue Bewerbung erfassen — alle Pflichtfelder ausfüllen",
+    "fields": [
+      {
+        "id": "applicant_name",
+        "label": "Name des Bewerbers",
+        "type": "text",
+        "required": true,
+        "placeholder": "Vorname Nachname"
+      },
+      {
+        "id": "applicant_email",
+        "label": "E-Mail Bewerber",
+        "type": "text",
+        "required": true,
+        "placeholder": "bewerber@email.de"
+      },
+      {
+        "id": "applicant_phone",
+        "label": "Telefon",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "position",
+        "label": "Stelle / Position",
+        "type": "text",
+        "required": true,
+        "placeholder": "z.B. Elektriker, IT-Administrator"
+      },
+      {
+        "id": "department",
+        "label": "Abteilung",
+        "type": "text",
+        "required": true,
+        "placeholder": "z.B. IT, HR, Technik"
+      },
+      {
+        "id": "start_date",
+        "label": "Gewünschter Starttermin",
+        "type": "date",
+        "required": false
+      },
+      {
+        "id": "salary",
+        "label": "Gehaltsvorstellung (€)",
+        "type": "number",
+        "required": false,
+        "min": 0
+      },
+      {
+        "id": "source",
+        "label": "Bewerbungsweg",
+        "type": "text",
+        "required": false,
+        "placeholder": "z.B. LinkedIn, Initiativbewerbung, Empfehlung"
+      },
+      {
+        "id": "documents",
+        "label": "Eingereichte Dokumente",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "z.B. Lebenslauf ✅, Zeugnisse ✅, Anschreiben ✅"
+      },
+      {
+        "id": "notes",
+        "label": "Interne Notizen",
+        "type": "textarea",
+        "required": false
+      }
+    ]
+  },
+  "steps": [
+    {
+      "id": "submit",
+      "type": "form",
+      "actor": "hr",
+      "onApprove": "notify-hr-new"
+    },
+    {
+      "id": "notify-hr-new",
+      "type": "action",
+      "actor": "system",
+      "action": "notify-hr-new",
+      "onApprove": "hr-document-check"
+    },
+    {
+      "id": "hr-document-check",
+      "type": "approval",
+      "actor": "hr",
+      "onApprove": "schedule-interview",
+      "onReject": "notify-rejected"
+    },
+    {
+      "id": "schedule-interview",
+      "type": "action",
+      "actor": "system",
+      "action": "schedule-interview",
+      "onApprove": "interview-decision"
+    },
+    {
+      "id": "interview-decision",
+      "type": "approval",
+      "actor": "manager",
+      "onApprove": "notify-accepted",
+      "onReject": "notify-rejected"
+    },
+    {
+      "id": "notify-accepted",
+      "type": "action",
+      "actor": "system",
+      "action": "notify-accepted",
+      "onApprove": "trigger-onboarding"
+    },
+    {
+      "id": "trigger-onboarding",
+      "type": "action",
+      "actor": "system",
+      "action": "trigger-onboarding",
+      "onApprove": "done"
+    },
+    {
+      "id": "notify-rejected",
+      "type": "action",
+      "actor": "system",
+      "action": "notify-rejected",
+      "onApprove": "done"
+    }
+  ],
+  "triggers": [
+    {
+      "event": "application.received",
+      "description": "Startet automatisch wenn eine Bewerbung per E-Mail eingeht",
+      "submitter": {
+        "username": "hr-system",
+        "name": "HR System",
+        "department": "HR",
+        "manager": "carol"
+      }
+    }
+  ]
+}
