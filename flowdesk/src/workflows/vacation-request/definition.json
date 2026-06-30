@@ -1,0 +1,22 @@
+{
+  "id": "vacation-request",
+  "name": "Urlaubsantrag",
+  "description": "Urlaubsantrag stellen und genehmigen lassen",
+  "icon": "🏖️",
+  "roles": ["employee", "manager"],
+  "form": {
+    "fields": [
+      { "id": "start_date", "label": "Von",                "type": "date",     "required": true  },
+      { "id": "end_date",   "label": "Bis",                "type": "date",     "required": true  },
+      { "id": "days",       "label": "Anzahl Arbeitstage", "type": "number",   "required": true, "min": 1 },
+      { "id": "note",       "label": "Hinweis (optional)", "type": "textarea", "required": false }
+    ]
+  },
+  "steps": [
+    { "id": "submit",           "type": "form",     "actor": "submitter", "onApprove": "notify-manager"    },
+    { "id": "notify-manager",   "type": "action",   "actor": "system",    "action": "notify-manager",   "onApprove": "manager-approval" },
+    { "id": "manager-approval", "type": "approval", "actor": "manager",   "onApprove": "notify-approved", "onReject": "notify-rejected"  },
+    { "id": "notify-approved",  "type": "action",   "actor": "system",    "action": "notify-approved",  "onApprove": "done" },
+    { "id": "notify-rejected",  "type": "action",   "actor": "system",    "action": "notify-rejected",  "onApprove": "done" }
+  ]
+}

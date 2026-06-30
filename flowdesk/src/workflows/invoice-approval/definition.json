@@ -1,0 +1,66 @@
+{
+  "id": "invoice-approval",
+  "name": "Rechnungsfreigabe",
+  "description": "Rechnung einreichen — automatische Prüfung, bedingte Freigabe & parallele Kontrolle",
+  "icon": "🧾",
+  "roles": ["employee", "manager", "hr"],
+
+  "triggers": [
+    {
+      "event": "invoice.received",
+      "description": "Startet automatisch wenn eine Rechnung per Webhook eingeht",
+      "submitter": { "username": "system", "name": "System", "department": "IT", "manager": null }
+    }
+  ],
+
+  "steps": [
+    { "id": "submit",             "type": "form",      "actor": "submitter", "onApprove": "check-invoice"                                                          },
+    { "id": "check-invoice",      "type": "action",    "actor": "system",    "action": "check-invoice",         "onApprove": "route-by-amount", "onReject": "notify-auto-rejected" },
+    { "id": "notify-auto-rejected","type": "action",   "actor": "system",    "action": "notify-auto-rejected",  "onApprove": "done"                                },
+
+    {
+      "id": "route-by-amount",
+      "type": "condition",
+      "condition": "amount > 10000",
+      "onTrue":  "parallel-approval",
+      "onFalse": "manager-approval"
+    },
+
+    {
+      "id": "manager-approval",
+      "type": "approval",
+      "actor": "manager",
+      "onApprove": "notify-approved",
+      "onReject":  "notify-rejected",
+      "timeout": { "hours": 48, "onExpire": "escalate" }
+    },
+
+    {
+      "id": "escalate",
+      "type": "action",
+      "actor": "system",
+      "action": "escalate",
+      "onApprove": "senior-approval"
+    },
+
+    {
+      "id": "senior-approval",
+      "type": "approval",
+      "actor": "admin",
+      "onApprove": "notify-approved",
+      "onReject":  "notify-rejected"
+    },
+
+    {
+      "id": "parallel-approval",
+      "type": "parallel",
+      "branches": ["notify-manager-parallel", "notify-hr-parallel"],
+      "onAllApproved": "notify-approved"
+    },
+    { "id": "notify-manager-parallel", "type": "action", "actor": "system", "action": "notify-manager-parallel", "onApprove": "done" },
+    { "id": "notify-hr-parallel",      "type": "action", "actor": "system", "action": "notify-hr-parallel",      "onApprove": "done" },
+
+    { "id": "notify-approved", "type": "action", "actor": "system", "action": "notify-approved", "onApprove": "done" },
+    { "id": "notify-rejected", "type": "action", "actor": "system", "action": "notify-rejected", "onApprove": "done" }
+  ]
+}

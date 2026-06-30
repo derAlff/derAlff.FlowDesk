@@ -1,0 +1,31 @@
+{
+  "id": "employee-onboarding",
+  "name": "Mitarbeiter Onboarding",
+  "description": "Onboarding-Checkliste für neue Mitarbeiter — HR, IT, Facility, Führungskraft",
+  "icon": "🎉",
+  "roles": ["hr", "admin"],
+
+  "form": {
+    "hint": "Wird automatisch aus dem Bewerbungsprozess befüllt — oder manuell starten",
+    "fields": [
+      { "id": "employee_name",  "label": "Name des Mitarbeiters", "type": "text", "required": true  },
+      { "id": "employee_email", "label": "Private E-Mail",        "type": "text", "required": true  },
+      { "id": "position",       "label": "Position / Stelle",     "type": "text", "required": true  },
+      { "id": "department",     "label": "Abteilung",             "type": "text", "required": true  },
+      { "id": "start_date",     "label": "Startdatum",            "type": "date", "required": true  },
+      { "id": "application_id", "label": "Bewerbungs-ID",         "type": "text", "required": false }
+    ]
+  },
+
+  "steps": [
+    { "id": "submit",                "type": "form",     "actor": "hr",       "onApprove": "hr-preparation"                                          },
+    { "id": "hr-preparation",        "type": "approval", "actor": "hr",       "onApprove": "notify-it",          "onReject": "done"                  },
+    { "id": "notify-it",             "type": "action",   "actor": "system",   "action": "notify-it",             "onApprove": "it-setup"             },
+    { "id": "it-setup",              "type": "approval", "actor": "it",       "onApprove": "notify-facility",    "onReject": "notify-it"             },
+    { "id": "notify-facility",       "type": "action",   "actor": "system",   "action": "notify-facility",       "onApprove": "facility-setup"       },
+    { "id": "facility-setup",        "type": "approval", "actor": "facility", "onApprove": "notify-manager",     "onReject": "notify-facility"       },
+    { "id": "notify-manager",        "type": "action",   "actor": "system",   "action": "notify-manager",        "onApprove": "manager-induction"    },
+    { "id": "manager-induction",     "type": "approval", "actor": "manager",  "onApprove": "notify-complete",    "onReject": "notify-manager"        },
+    { "id": "notify-complete",       "type": "action",   "actor": "system",   "action": "notify-complete",       "onApprove": "done"                 }
+  ]
+}
