@@ -209,11 +209,20 @@ function renderWorkflowForm(user, wf, error) {
       ).join('');
       const placeholderOpt = f.defaultValue ? '' : '<option value="">— bitte wählen —</option>';
       input = `<select name="${f.id}" ${f.required ? 'required' : ''}>${placeholderOpt}${opts}</select>`;
-    } else {
+    } /*else {
       input = `<input type="${f.type}" name="${f.id}"
         placeholder="${f.placeholder||''}"
         ${f.min !== undefined ? `min="${f.min}"` : ''}
         ${f.step ? `step="${f.step}"` : ''}
+        ${f.required ? 'required' : ''}>`;
+    }*/
+    else {
+      input = `<input type="${f.type}" name="${f.id}"
+        placeholder="${f.placeholder||''}"
+        value="${f.defaultValue !== undefined ? f.defaultValue : ''}"
+        ${f.min !== undefined ? `min="${f.min}"` : ''}
+        ${f.step ? `step="${f.step}"` : ''}
+        ${f.readOnly ? 'readonly' : ''}
         ${f.required ? 'required' : ''}>`;
     }
     return `<div class="form-group"><label>${f.label}${f.required ? ' *' : ''}</label>${input}</div>`;
@@ -229,6 +238,7 @@ function renderWorkflowForm(user, wf, error) {
     hint:          form.hint || '',
     actionUrl:     `/workflow/${wf.id}`,
     fields:        fieldsHtml,
+    submitLabel:   wf.submitLabel || 'Antrag einreichen',
   });
 
   return page(wf.name, body, user);

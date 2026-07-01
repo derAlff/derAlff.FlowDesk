@@ -559,6 +559,14 @@ tbody tr:hover { background: var(--bg); }
 
 /* ── FORMS ────────────────────────────────────────────────────────── */
 
+/*.form-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 32px 36px;
+  max-width: 600px;
+}*/
 .form-card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -566,6 +574,7 @@ tbody tr:hover { background: var(--bg); }
   box-shadow: var(--shadow-sm);
   padding: 32px 36px;
   max-width: 600px;
+  margin: 0 auto;
 }
 
 .form-group { margin-bottom: 22px; }

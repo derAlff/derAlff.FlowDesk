@@ -21,8 +21,57 @@
     {{{fields}}}
     <hr style="margin: 24px 0;">
     <div class="btn-row">
-      <button type="submit" class="btn btn-primary btn-lg">Antrag einreichen</button>
+      <!--<button type="submit" class="btn btn-primary btn-lg">Antrag einreichen</button>-->
+      <button type="submit" class="btn btn-primary btn-lg">{{submitLabel}}</button>
       <a href="/" class="btn btn-ghost btn-lg">Abbrechen</a>
     </div>
   </form>
+
 </div>
+
+<script>
+(function () {
+  const startInput = document.querySelector('[name="start_date"]');
+  const endInput = document.querySelector('[name="end_date"]');
+  const daysInput = document.querySelector('[name="days"]');
+
+  if (!startInput || !endInput || !daysInput) return;
+
+  const heute = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  startInput.min = heute;
+  endInput.min = heute;
+
+  function berechneArbeitstage(startStr, endStr) {
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    if (isNaN(start) || isNaN(end) || end < start) return 0;
+
+    let tage = 0;
+    const cursor = new Date(start);
+    while (cursor <= end) {
+      const wochentag = cursor.getDay();
+      if (wochentag !== 0 && wochentag !== 6) tage++;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    return tage;
+  }
+
+  function korrigiereVergangenheit(input) {
+    if (input.value && input.value < heute) {
+      input.value = heute;
+    }
+  }
+
+  function updateDays() {
+    korrigiereVergangenheit(startInput);
+    korrigiereVergangenheit(endInput);
+    const tage = berechneArbeitstage(startInput.value, endInput.value);
+    daysInput.value = tage > 0 ? tage : '';
+  }
+
+  startInput.addEventListener('change', updateDays);
+  endInput.addEventListener('change', updateDays);
+
+  daysInput.readOnly = true;
+})();
+</script>

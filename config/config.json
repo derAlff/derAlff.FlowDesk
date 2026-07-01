@@ -67,7 +67,8 @@
 
   "login": {
     "showDemoHint":    true,
-    "backgroundImage": "https://alphabau.lu/wp-content/uploads/2024/10/Ueber_Uns.jpg",
+    
+    "backgroundImage": "https://alphabau.lu/wp-content/uploads/2024/08/Mercedes-Benz-Unimog-U1450-DoKa-400x300.jpg",
     "welcomeMessage":  "AlphaBau Mitarbeiterportal",
     "logoVisible":     true
   }
