@@ -6,15 +6,74 @@
 const ldap = require('ldapjs');
 
 // Mock users for development (replace with real AD groups)
+//
+// Hierarchie:
+//   Peter (CEO)
+//     └─ Markus (Bereichsleiter)
+//          ├─ Michael  (Manager Einkauf)   ─ Lukas, Sandra
+//          ├─ Klaus    (Manager Werkstatt) ─ Tom, Jonas, Erik
+//          ├─ Paula    (Manager HR)        ─ Nina, Sophie
+//          └─ Chris    (Manager IT)        ─ Tarek, Lea
+//
 const MOCK_USERS = [
-  { username: 'alice',    password: 'test', name: 'Alice Müller',   role: 'employee',  department: 'IT',       manager: 'bob'    },
-  { username: 'bob',      password: 'test', name: 'Bob Schmidt',    role: 'manager',   department: 'IT',       manager: null     },
-  { username: 'carol',    password: 'test', name: 'Carol Weber',    role: 'hr',        department: 'HR',       manager: 'dave'   },
-  { username: 'dave',     password: 'test', name: 'Dave Fischer',   role: 'manager',   department: 'HR',       manager: null     },
-  { username: 'ingo',     password: 'test', name: 'Ingo Braun',     role: 'it',        department: 'IT',       manager: 'bob'    },
-  { username: 'frank',    password: 'test', name: 'Frank Neumann',  role: 'facility',  department: 'Facility', manager: null     },
-  { username: 'admin',    password: 'test', name: 'Admin User',     role: 'admin',     department: 'IT',       manager: null     },
+  // ── Geschäftsführung ──────────────────────────────────────────────────────
+  { username: 'peter',    password: 'test', name: 'Peter Hoffmann',  role: 'manager',  department: 'Geschäftsführung', manager: null     },
+  { username: 'markus',   password: 'test', name: 'Markus Reiter',   role: 'manager',  department: 'Geschäftsführung', manager: 'peter'  },
+
+  // ── Einkauf ───────────────────────────────────────────────────────────────
+  { username: 'michael',  password: 'test', name: 'Michael Berg',    role: 'manager',  department: 'Einkauf',   manager: 'markus' },
+  { username: 'lukas',    password: 'test', name: 'Lukas Vogt',      role: 'employee', department: 'Einkauf',   manager: 'michael' },
+  { username: 'sandra',   password: 'test', name: 'Sandra Keller',   role: 'employee', department: 'Einkauf',   manager: 'michael' },
+
+  // ── Werkstatt ─────────────────────────────────────────────────────────────
+  { username: 'klaus',    password: 'test', name: 'Klaus Wagner',    role: 'manager',  department: 'Werkstatt', manager: 'markus' },
+  { username: 'tom',      password: 'test', name: 'Tom Lindner',     role: 'employee', department: 'Werkstatt', manager: 'klaus' },
+  { username: 'jonas',    password: 'test', name: 'Jonas Brandt',    role: 'employee', department: 'Werkstatt', manager: 'klaus' },
+  { username: 'erik',     password: 'test', name: 'Erik Schuster',   role: 'employee', department: 'Werkstatt', manager: 'klaus' },
+
+  // ── HR ────────────────────────────────────────────────────────────────────
+  { username: 'paula',    password: 'test', name: 'Paula Hartmann',  role: 'hr',       department: 'HR',       manager: 'markus' },
+  { username: 'nina',     password: 'test', name: 'Nina Krause',     role: 'employee', department: 'HR',       manager: 'paula' },
+  { username: 'sophie',   password: 'test', name: 'Sophie Albrecht', role: 'employee', department: 'HR',       manager: 'paula' },
+
+  // ── IT ────────────────────────────────────────────────────────────────────
+  { username: 'chris',    password: 'test', name: 'Chris Mertens',   role: 'it',       department: 'IT',       manager: 'markus' },
+  { username: 'tarek',    password: 'test', name: 'Tarek Younis',    role: 'employee', department: 'IT',       manager: 'chris' },
+  { username: 'lea',      password: 'test', name: 'Lea Sommer',      role: 'employee', department: 'IT',       manager: 'chris' },
+
+  // ── Sonstiges (bestehend, für Facility/Demo-Workflows) ──────────────────────
+  { username: 'frank',    password: 'test', name: 'Frank Neumann',   role: 'facility', department: 'Facility', manager: 'markus' },
+  { username: 'admin',    password: 'test', name: 'Admin User',      role: 'admin',    department: 'IT',       manager: null     },
 ];
+
+/**
+ * Findet einen User per Username (Mock — bei LDAP müsste das per Suche laufen)
+ */
+function getUserByUsername(username) {
+  const u = MOCK_USERS.find(u => u.username === username);
+  if (!u) return null;
+  return { username: u.username, name: u.name, role: u.role, department: u.department, manager: u.manager };
+}
+
+/**
+ * Liefert die komplette Vorgesetzten-Kette nach oben, bis zum CEO
+ * z.B. für lukas: [ michael, markus, peter ]
+ */
+function getManagerChain(username) {
+  const chain = [];
+  let current = getUserByUsername(username);
+  const seen = new Set();
+
+  while (current && current.manager && !seen.has(current.manager)) {
+    seen.add(current.manager);
+    const managerUser = getUserByUsername(current.manager);
+    if (!managerUser) break;
+    chain.push(managerUser);
+    current = managerUser;
+  }
+
+  return chain;
+}
 
 async function authenticateUser(username, password) {
   const ldapUrl = process.env.LDAP_URL;
@@ -108,4 +167,4 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { authenticateUser, requireAuth, requireRole };
+module.exports = { authenticateUser, requireAuth, requireRole, getManagerChain, getUserByUsername };

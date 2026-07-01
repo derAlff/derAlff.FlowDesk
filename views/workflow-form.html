@@ -1,20 +1,28 @@
-<a href="/" style="color:var(--muted);font-size:13px;">← Zurück</a>
-<h1 style="margin-top:16px;">{{icon}} {{name}}</h1>
-<p class="subtitle">{{description}}</p>
+<a href="/" class="back-link">Dashboard</a>
+
+<div class="page-header">
+  <div style="font-size:36px;margin-bottom:8px;">{{icon}}</div>
+  <h1>{{name}}</h1>
+  <p class="subtitle">{{description}}</p>
+</div>
 
 {{#if hasError}}
-<div class="alert alert-error">{{errorMessage}}</div>
+<div class="alert alert-error">⚠ {{errorMessage}}</div>
 {{/if}}
 
 <div class="form-card">
   {{#if hasHint}}
-  <div class="alert alert-info" style="font-size:13px;">ℹ️ {{hint}}</div>
+  <div class="alert alert-info" style="margin-bottom:24px;">
+    ℹ {{hint}}
+  </div>
   {{/if}}
+
   <form method="POST" action="{{actionUrl}}">
     {{{fields}}}
+    <hr style="margin: 24px 0;">
     <div class="btn-row">
-      <button type="submit" class="btn btn-primary">Antrag stellen</button>
-      <a href="/" class="btn btn-ghost">Abbrechen</a>
+      <button type="submit" class="btn btn-primary btn-lg">Antrag einreichen</button>
+      <a href="/" class="btn btn-ghost btn-lg">Abbrechen</a>
     </div>
   </form>
 </div>

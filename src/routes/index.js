@@ -55,7 +55,7 @@ router.get('/', requireAuth, (req, res) => {
 
 router.get('/workflow/:id', requireAuth, (req, res) => {
   const user = req.session.user;
-  const wf = engine.getWorkflow(req.params.id);
+  const wf = engine.getWorkflow(req.params.id, user);
   if (!wf) return res.status(404).send('Workflow nicht gefunden');
   res.send(renderWorkflowForm(user, wf, req.query.error));
 });
@@ -138,6 +138,9 @@ function renderLogin(error) {
     tagline:          company.tagline,
     hasError:         !!error,
     showDemoHint:     login.showDemoHint,
+    appTitle:         app.title,
+    companyName:      company.name,
+    companyPhone:     company.phone || '',
   });
 
   return page('Anmelden', body);
@@ -148,10 +151,11 @@ function renderDashboard(user, workflows, myRequests, pendingApprovals) {
   const statusClass = { running: 'status-running', approved: 'status-approved', rejected: 'status-rejected' };
 
   const workflowCards = workflows.map(wf => `
-    <a href="/workflow/${wf.id}" class="card">
-      <div class="card-icon">${wf.icon}</div>
-      <div class="card-title">${wf.name}</div>
-      <div class="card-desc">${wf.description}</div>
+    <a href="/workflow/${wf.id}" class="workflow-card">
+      <div class="workflow-icon">${wf.icon}</div>
+      <div class="workflow-name">${wf.name}</div>
+      <div class="workflow-desc">${wf.description}</div>
+      <div class="workflow-cta">Starten</div>
     </a>
   `).join('');
 
@@ -200,8 +204,11 @@ function renderWorkflowForm(user, wf, error) {
     if (f.type === 'textarea') {
       input = `<textarea name="${f.id}" placeholder="${f.placeholder||''}" ${f.required ? 'required' : ''}></textarea>`;
     } else if (f.type === 'select') {
-      const opts = (f.options || []).map(o => `<option value="${o.value}">${o.label}</option>`).join('');
-      input = `<select name="${f.id}" ${f.required ? 'required' : ''}><option value="">— bitte wählen —</option>${opts}</select>`;
+      const opts = (f.options || []).map(o =>
+        `<option value="${o.value}" ${o.value === f.defaultValue ? 'selected' : ''}>${o.label}</option>`
+      ).join('');
+      const placeholderOpt = f.defaultValue ? '' : '<option value="">— bitte wählen —</option>';
+      input = `<select name="${f.id}" ${f.required ? 'required' : ''}>${placeholderOpt}${opts}</select>`;
     } else {
       input = `<input type="${f.type}" name="${f.id}"
         placeholder="${f.placeholder||''}"
@@ -238,15 +245,25 @@ function renderInstance(user, instance, wf) {
 
   const dataRows = Object.entries(instance.formData)
     .filter(([k]) => !k.startsWith('_') && k !== 'raw_text')
-    .map(([k, v]) => `<tr><td style="color:var(--muted);width:40%">${k}</td><td><strong>${v}</strong></td></tr>`)
+    .map(([k, v]) => `<tr><td>${k}</td><td>${v || '–'}</td></tr>`)
     .join('');
+
+  const actionClass = { approve: 'tl-action-approve', reject: 'tl-action-reject', submitted: 'tl-action-submit' };
+  const actionLabel = { approve: 'Genehmigt', reject: 'Abgelehnt', submitted: 'Eingereicht',
+    'condition-true': 'Bedingung erfüllt', 'condition-false': 'Bedingung nicht erfüllt',
+    'all-branches-completed': 'Alle Bereiche fertig', timeout: 'Timeout', completed: 'Abgeschlossen' };
 
   const timeline = instance.history.map(h => `
     <div class="timeline-item">
       <div class="tl-dot"></div>
-      <div>
-        <div><strong>${h.actor}</strong> – ${h.action}</div>
-        ${h.note ? `<div style="color:var(--muted);white-space:pre-line;">${h.note}</div>` : ''}
+      <div class="tl-content">
+        <div class="tl-actor">
+          ${h.actor}
+          <span class="tl-action ${actionClass[h.action] || 'tl-action-default'}">
+            ${actionLabel[h.action] || h.action}
+          </span>
+        </div>
+        ${h.note ? `<div class="tl-note">${h.note}</div>` : ''}
         <div class="tl-time">${dayjs(h.timestamp).format('DD.MM.YYYY HH:mm')}</div>
       </div>
     </div>

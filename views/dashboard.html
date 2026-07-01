@@ -1,29 +1,63 @@
-<h1>{{welcomeText}}, {{firstName}} 👋</h1>
-<p class="subtitle">{{department}} · {{role}}</p>
+<!-- Welcome Header -->
+<div class="welcome-header">
+  <div class="welcome-accent"></div>
+  <h1>{{welcomeText}}, {{firstName}}</h1>
+  <div class="welcome-sub">{{department}} · {{role}}</div>
+</div>
 
+<!-- Prozesse starten -->
+<div class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Verfügbare Prozesse</div>
+      <h2>Prozess starten</h2>
+    </div>
+  </div>
+  <div class="workflow-grid">{{{workflowCards}}}</div>
+</div>
+
+<!-- Offene Genehmigungen -->
 {{#if showPending}}
 <div class="section">
-  <h2>⏳ Offene Genehmigungen</h2>
+  <div class="section-header">
+    <h2>Offene Genehmigungen</h2>
+  </div>
   <div class="table-wrap">
-    <table>
-      <thead><tr><th>Prozess</th><th>Von</th><th>Eingereicht</th><th></th></tr></thead>
-      <tbody>{{{pendingRows}}}</tbody>
-    </table>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Prozess</th>
+            <th>Von</th>
+            <th class="hide-mobile">Eingereicht</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>{{{pendingRows}}}</tbody>
+      </table>
+    </div>
   </div>
 </div>
 {{/if}}
 
+<!-- Meine Anträge -->
 <div class="section">
-  <h2>🚀 Prozess starten</h2>
-  <div class="card-grid">{{{workflowCards}}}</div>
-</div>
-
-<div class="section">
-  <h2>📋 Meine Anträge</h2>
+  <div class="section-header">
+    <h2>Meine Anträge</h2>
+  </div>
   <div class="table-wrap">
-    <table>
-      <thead><tr><th>Prozess</th><th>Status</th><th>Datum</th><th></th></tr></thead>
-      <tbody>{{{myRequestRows}}}</tbody>
-    </table>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Prozess</th>
+            <th>Status</th>
+            <th class="hide-mobile">Datum</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>{{{myRequestRows}}}</tbody>
+      </table>
+    </div>
   </div>
 </div>

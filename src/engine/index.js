@@ -34,9 +34,10 @@ fs.readdirSync(workflowDir).forEach(name => {
 
   const definition = JSON.parse(fs.readFileSync(defFile, 'utf8'));
   const actions    = fs.existsSync(actionsFile) ? require(actionsFile) : {};
-  if (fs.existsSync(formFile)) definition.form = require(formFile)();
+  const buildForm  = fs.existsSync(formFile) ? require(formFile) : null;
 
-  WORKFLOWS[definition.id] = { ...definition, actions };
+  // Statisches Form aus JSON, falls kein form.js vorhanden
+  WORKFLOWS[definition.id] = { ...definition, actions, _buildForm: buildForm };
 });
 
 // ─── Trigger-Registry ─────────────────────────────────────────────────────────
@@ -118,7 +119,7 @@ const engine = {
       submitter:     submitter.username,
       submitterName: submitter.name,
       department:    submitter.department,
-      manager:       submitter.manager,
+      manager:       formData.approver || submitter.manager,
       currentStep:   firstStep.id,
       // Parallele Steps: trackt welche Branches fertig sind
       parallelState: {},
@@ -377,7 +378,16 @@ const engine = {
   },
 
   getInstance(id)      { return db.findOne('instances', { id }); },
-  getWorkflow(id)      { return WORKFLOWS[id]; },
+  // user optional — wird an form.js durchgereicht für user-abhängige Formulare
+  // (z.B. Genehmiger-Dropdown aus der Vorgesetzten-Kette)
+  getWorkflow(id, user = null) {
+    const wf = WORKFLOWS[id];
+    if (!wf) return null;
+    if (wf._buildForm) {
+      return { ...wf, form: wf._buildForm(user) };
+    }
+    return wf;
+  },
   getAllWorkflows()     { return WORKFLOWS; },
   getTriggerRegistry() { return TRIGGER_REGISTRY; },
   startTimeoutScheduler,

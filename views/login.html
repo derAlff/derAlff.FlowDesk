@@ -1,37 +1,62 @@
 <div class="login-hero {{heroClass}}" style="{{{heroStyle}}}">
   <div class="login-inner">
+
     {{#if hasBackground}}
+    <div class="welcome-accent"></div>
     <h1 class="login-heading-light">{{welcomeMessage}}</h1>
     <p class="login-sub-light">{{tagline}}</p>
     {{/if}}
+
     {{#if hasNoBackground}}
     <h1 style="margin-bottom:4px;">{{welcomeMessage}}</h1>
-    <p class="subtitle">{{tagline}}</p>
+    <p style="color:var(--text-3);margin-bottom:28px;font-size:14px;">{{tagline}}</p>
     {{/if}}
 
     {{#if hasError}}
-    <div class="alert alert-error">Benutzername oder Passwort falsch.</div>
+    <div class="alert alert-error" style="margin-bottom:20px;">
+      ⚠ Benutzername oder Passwort falsch. Bitte erneut versuchen.
+    </div>
     {{/if}}
 
-    <div class="form-card">
-      <form method="POST" action="/login">
-        <div class="form-group">
-          <label>Benutzername</label>
-          <input type="text" name="username" autocomplete="username" required autofocus>
-        </div>
-        <div class="form-group">
-          <label>Passwort</label>
-          <input type="password" name="password" autocomplete="current-password" required>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%">Anmelden</button>
-      </form>
+    <div class="login-card">
+      <div class="login-stripe"></div>
+      <div class="login-body">
+        <div class="login-title">Anmelden</div>
+        <div class="login-sub-card">{{appTitle}} · Internes Prozessportal</div>
 
-      {{#if showDemoHint}}
-      <p style="margin-top:16px;font-size:12px;color:var(--muted);">
-        alice/test (Mitarbeiter) · bob/test (Manager) · carol/test (HR)<br>
-        ingo/test (IT) · frank/test (Facility) · admin/test
-      </p>
-      {{/if}}
+        <form method="POST" action="/login">
+          <div class="form-group">
+            <label for="username">Benutzername</label>
+            <input type="text" id="username" name="username"
+              placeholder="vorname.nachname"
+              autocomplete="username" required autofocus>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password"
+              placeholder="••••••••"
+              autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:16px;">
+            Anmelden
+          </button>
+        </form>
+
+        {{#if showDemoHint}}
+        <div class="demo-hint">
+          <strong>Demo-Zugänge</strong><br>
+          peter/test · markus/test · michael/test · lukas/test · sandra/test<br>
+          klaus/test · tom/test · jonas/test · erik/test<br>
+          paula/test · nina/test · sophie/test<br>
+          chris/test · tarek/test · lea/test · admin/test
+        </div>
+        {{/if}}
+      </div>
+      <div class="login-footer">
+        <span>{{companyName}}</span>
+        <span>{{companyPhone}}</span>
+      </div>
     </div>
+
   </div>
 </div>
