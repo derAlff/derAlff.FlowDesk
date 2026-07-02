@@ -11,6 +11,31 @@
   </p>
 </div>
 
+<!-- Offene Rückfrage für Antragsteller -->
+{{#if canAnswer}}
+<div class="alert-question" style="margin-bottom:24px;">
+  <div class="alert-question-icon">❓</div>
+  <div class="alert-question-body">
+    <div class="alert-question-title">Rückfrage von Ihrem Genehmiger</div>
+    <div class="alert-question-text">{{questionText}}</div>
+  </div>
+</div>
+<div class="card" style="max-width:600px;margin-bottom:32px;">
+  <div class="card-header"><h2>Ihre Antwort</h2></div>
+  <div class="card-body">
+    <form method="POST" action="/instance/{{instanceId}}/answer">
+      <div class="form-group">
+        <label>Antwort *</label>
+        <textarea name="answer" placeholder="Ihre Antwort auf die Rückfrage..." required></textarea>
+      </div>
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary btn-lg">Antwort absenden</button>
+      </div>
+    </form>
+  </div>
+</div>
+{{/if}}
+
 <div class="detail-grid">
   <!-- Angaben -->
   <div class="card">
@@ -31,7 +56,7 @@
   </div>
 </div>
 
-<!-- Entscheidung -->
+<!-- Entscheidung für Genehmiger -->
 {{#if canDecide}}
 <div class="card" style="max-width:600px;">
   <div class="card-header">
@@ -40,8 +65,8 @@
   <div class="card-body">
     <form method="POST" action="/instance/{{instanceId}}/decide">
       <div class="form-group">
-        <label>Kommentar (optional)</label>
-        <textarea name="note" placeholder="Begründung oder Anmerkung..."></textarea>
+        <label>Kommentar</label>
+        <textarea name="note" placeholder="Begründung, Anmerkung oder Rückfrage..."></textarea>
       </div>
       <div class="btn-row">
         <button type="submit" name="action" value="approve" class="btn btn-success btn-lg">
@@ -50,6 +75,11 @@
         <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg">
           ✗ Ablehnen
         </button>
+        {{#if canQuestion}}
+        <button type="submit" name="action" value="question" class="btn btn-question btn-lg">
+          ? Rückfrage stellen
+        </button>
+        {{/if}}
       </div>
     </form>
   </div>

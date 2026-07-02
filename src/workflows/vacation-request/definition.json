@@ -5,10 +5,11 @@
   "icon": "🏖️",
   "roles": ["employee", "manager"],
   "steps": [
-    { "id": "submit",           "type": "form",     "actor": "submitter", "onApprove": "notify-manager"    },
-    { "id": "notify-manager",   "type": "action",   "actor": "system",    "action": "notify-manager",   "onApprove": "manager-approval" },
-    { "id": "manager-approval", "type": "approval", "actor": "manager",   "onApprove": "notify-approved", "onReject": "notify-rejected"  },
-    { "id": "notify-approved",  "type": "action",   "actor": "system",    "action": "notify-approved",  "onApprove": "done" },
-    { "id": "notify-rejected",  "type": "action",   "actor": "system",    "action": "notify-rejected",  "onApprove": "done" }
+    { "id": "submit",             "type": "form",     "actor": "submitter", "onApprove": "notify-manager"                                                      },
+    { "id": "notify-manager",     "type": "action",   "actor": "system",    "action": "notify-manager",    "onApprove": "manager-approval"                     },
+    { "id": "manager-approval",   "type": "approval", "actor": "manager",   "onApprove": "notify-approved", "onReject": "notify-rejected", "onQuestion": "clarification" },
+    { "id": "clarification",      "type": "question", "actor": "submitter"                                                                                     },
+    { "id": "notify-approved",    "type": "action",   "actor": "system",    "action": "notify-approved",   "onApprove": "done"                                 },
+    { "id": "notify-rejected",    "type": "action",   "actor": "system",    "action": "notify-rejected",   "onApprove": "done"                                 }
   ]
 }

@@ -17,33 +17,33 @@ const ldap = require('ldapjs');
 //
 const MOCK_USERS = [
   // ── Geschäftsführung ──────────────────────────────────────────────────────
-  { username: 'peter',    password: 'test', name: 'Peter Hoffmann',  email: 'p.hoffmann@firma.lu', role: 'manager',  department: 'Geschäftsführung', manager: null     },
-  { username: 'markus',   password: 'test', name: 'Markus Reiter',   email: 'm.reiter@firma.lu',   role: 'manager',  department: 'Bereichsführung', manager: 'peter'  },
+  { username: 'peter',    password: 'test', name: 'Peter Hoffmann',  role: 'manager',  department: 'Geschäftsführung', manager: null     },
+  { username: 'markus',   password: 'test', name: 'Markus Reiter',   role: 'manager',  department: 'Geschäftsführung', manager: 'peter'  },
 
   // ── Einkauf ───────────────────────────────────────────────────────────────
-  { username: 'michael',  password: 'test', name: 'Michael Berg',    email: 'm.berg@firma.lu',     role: 'manager',  department: 'Einkauf',   manager: 'markus' },
-  { username: 'lukas',    password: 'test', name: 'Lukas Vogt',      email: 'l.vogt@firma.lu',     role: 'employee', department: 'Einkauf',   manager: 'michael' },
-  { username: 'sandra',   password: 'test', name: 'Sandra Keller',   email: 's.keller@firma.lu',   role: 'employee', department: 'Einkauf',   manager: 'michael' },
+  { username: 'michael',  password: 'test', name: 'Michael Berg',    role: 'manager',  department: 'Einkauf',   manager: 'markus' },
+  { username: 'lukas',    password: 'test', name: 'Lukas Vogt',      role: 'employee', department: 'Einkauf',   manager: 'michael' },
+  { username: 'sandra',   password: 'test', name: 'Sandra Keller',   role: 'employee', department: 'Einkauf',   manager: 'michael' },
 
   // ── Werkstatt ─────────────────────────────────────────────────────────────
-  { username: 'klaus',    password: 'test', name: 'Klaus Wagner',    email: 'k.wagner@firma.lu',   role: 'manager',  department: 'Werkstatt', manager: 'markus' },
-  { username: 'tom',      password: 'test', name: 'Tom Lindner',     email: 't.lindner@firma.lu',  role: 'employee', department: 'Werkstatt', manager: 'klaus' },
-  { username: 'jonas',    password: 'test', name: 'Jonas Brandt',    email: 'j.brandt@firma.lu',   role: 'employee', department: 'Werkstatt', manager: 'klaus' },
-  { username: 'erik',     password: 'test', name: 'Erik Schuster',   email: 'e.schuster@firma.lu', role: 'employee', department: 'Werkstatt', manager: 'klaus' },
+  { username: 'klaus',    password: 'test', name: 'Klaus Wagner',    role: 'manager',  department: 'Werkstatt', manager: 'markus' },
+  { username: 'tom',      password: 'test', name: 'Tom Lindner',     role: 'employee', department: 'Werkstatt', manager: 'klaus' },
+  { username: 'jonas',    password: 'test', name: 'Jonas Brandt',    role: 'employee', department: 'Werkstatt', manager: 'klaus' },
+  { username: 'erik',     password: 'test', name: 'Erik Schuster',   role: 'employee', department: 'Werkstatt', manager: 'klaus' },
 
   // ── HR ────────────────────────────────────────────────────────────────────
-  { username: 'paula',    password: 'test', name: 'Paula Hartmann',  email: 'p.hartmann@firma.lu', role: 'hr',       department: 'HR',       manager: 'markus' },
-  { username: 'nina',     password: 'test', name: 'Nina Krause',     email: 'n.krause@firma.lu',   role: 'employee', department: 'HR',       manager: 'paula' },
-  { username: 'sophie',   password: 'test', name: 'Sophie Albrecht', email: 's.albrecht@firma.lu', role: 'employee', department: 'HR',       manager: 'paula' },
+  { username: 'paula',    password: 'test', name: 'Paula Hartmann',  role: 'hr',       department: 'HR',       manager: 'markus' },
+  { username: 'nina',     password: 'test', name: 'Nina Krause',     role: 'employee', department: 'HR',       manager: 'paula' },
+  { username: 'sophie',   password: 'test', name: 'Sophie Albrecht', role: 'employee', department: 'HR',       manager: 'paula' },
 
   // ── IT ────────────────────────────────────────────────────────────────────
-  { username: 'chris',    password: 'test', name: 'Chris Mertens',   email: 'c.mertens@firma.lu',  role: 'it',       department: 'IT',       manager: 'markus' },
-  { username: 'tarek',    password: 'test', name: 'Tarek Younis',    email: 't.younis@firma.lu',   role: 'employee', department: 'IT',       manager: 'chris' },
-  { username: 'lea',      password: 'test', name: 'Lea Sommer',      email: 'l.sommer@firma.lu',   role: 'employee', department: 'IT',       manager: 'chris' },
+  { username: 'chris',    password: 'test', name: 'Chris Mertens',   role: 'it',       department: 'IT',       manager: 'markus' },
+  { username: 'tarek',    password: 'test', name: 'Tarek Younis',    role: 'employee', department: 'IT',       manager: 'chris' },
+  { username: 'lea',      password: 'test', name: 'Lea Sommer',      role: 'employee', department: 'IT',       manager: 'chris' },
 
   // ── Sonstiges (bestehend, für Facility/Demo-Workflows) ──────────────────────
-  { username: 'frank',    password: 'test', name: 'Frank Neumann',   email: 'f.neumann@firma.lu',  role: 'facility', department: 'Facility', manager: 'markus' },
-  { username: 'admin',    password: 'test', name: 'Admin User',      email: 'admin@firma.lu',      role: 'admin',    department: 'IT',       manager: null     },
+  { username: 'frank',    password: 'test', name: 'Frank Neumann',   role: 'facility', department: 'Facility', manager: 'markus' },
+  { username: 'admin',    password: 'test', name: 'Admin User',      role: 'admin',    department: 'IT',       manager: null     },
 ];
 
 /**
@@ -52,7 +52,7 @@ const MOCK_USERS = [
 function getUserByUsername(username) {
   const u = MOCK_USERS.find(u => u.username === username);
   if (!u) return null;
-  return { username: u.username, name: u.name, email: u.email, role: u.role, department: u.department, manager: u.manager };
+  return { username: u.username, name: u.name, role: u.role, department: u.department, manager: u.manager };
 }
 
 /**
@@ -87,7 +87,6 @@ async function authenticateUser(username, password) {
     return {
       username: user.username,
       name: user.name,
-      email: user.email,
       role: user.role,
       department: user.department,
       manager: user.manager,

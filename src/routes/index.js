@@ -86,9 +86,21 @@ router.get('/instance/:id', requireAuth, (req, res) => {
 router.post('/instance/:id/decide', requireAuth, (req, res) => {
   const user = req.session.user;
   const { action, note } = req.body;
-  if (!['approve', 'reject'].includes(action)) return res.status(400).send('Ungültige Aktion');
+  if (!['approve', 'reject', 'question'].includes(action)) return res.status(400).send('Ungültige Aktion');
   try {
     engine.decide(req.params.id, user, action, note);
+    res.redirect(action === 'question' ? `/instance/${req.params.id}` : '/');
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
+});
+
+router.post('/instance/:id/answer', requireAuth, (req, res) => {
+  const user = req.session.user;
+  const { answer } = req.body;
+  if (!answer?.trim()) return res.redirect(`/instance/${req.params.id}`);
+  try {
+    engine.answer(req.params.id, user, answer);
     res.redirect('/');
   } catch (e) {
     res.status(500).send(e.message);
@@ -209,14 +221,7 @@ function renderWorkflowForm(user, wf, error) {
       ).join('');
       const placeholderOpt = f.defaultValue ? '' : '<option value="">— bitte wählen —</option>';
       input = `<select name="${f.id}" ${f.required ? 'required' : ''}>${placeholderOpt}${opts}</select>`;
-    } /*else {
-      input = `<input type="${f.type}" name="${f.id}"
-        placeholder="${f.placeholder||''}"
-        ${f.min !== undefined ? `min="${f.min}"` : ''}
-        ${f.step ? `step="${f.step}"` : ''}
-        ${f.required ? 'required' : ''}>`;
-    }*/
-    else {
+    } else {
       input = `<input type="${f.type}" name="${f.id}"
         placeholder="${f.placeholder||''}"
         value="${f.defaultValue !== undefined ? f.defaultValue : ''}"
@@ -249,23 +254,47 @@ function renderInstance(user, instance, wf) {
   const statusClass = { running: 'status-running', approved: 'status-approved', rejected: 'status-rejected' };
 
   const currentStep = wf?.steps.find(s => s.id === instance.currentStep);
+
+  // Approval: Manager kann genehmigen/ablehnen/rückfragen
   const canDecide = currentStep?.type === 'approval'
     && (instance.manager === user.username || ['hr','it','facility','admin'].includes(user.role))
     && instance.status === 'running';
+
+  // Rückfrage: Hat der approval-Step onQuestion?
+  const canQuestion = canDecide && !!currentStep?.onQuestion;
+
+  // Antworten: Antragsteller sieht offene Rückfrage
+  const canAnswer = currentStep?.type === 'question'
+    && instance.submitter === user.username
+    && instance.status === 'running';
+
+  // Letzte Rückfrage aus der History holen (für Anzeige)
+  const lastQuestion = [...(instance.history || [])]
+    .reverse()
+    .find(h => h.action === 'question');
 
   const dataRows = Object.entries(instance.formData)
     .filter(([k]) => !k.startsWith('_') && k !== 'raw_text')
     .map(([k, v]) => `<tr><td>${k}</td><td>${v || '–'}</td></tr>`)
     .join('');
 
-  const actionClass = { approve: 'tl-action-approve', reject: 'tl-action-reject', submitted: 'tl-action-submit' };
-  const actionLabel = { approve: 'Genehmigt', reject: 'Abgelehnt', submitted: 'Eingereicht',
+  const actionClass = {
+    approve:   'tl-action-approve', reject:    'tl-action-reject',
+    submitted: 'tl-action-submit',  question:  'tl-action-question',
+    answered:  'tl-action-answered',
+  };
+  const actionLabel = {
+    approve:    'Genehmigt',    reject:   'Abgelehnt',
+    submitted:  'Eingereicht',  question: 'Rückfrage',
+    answered:   'Beantwortet',
     'condition-true': 'Bedingung erfüllt', 'condition-false': 'Bedingung nicht erfüllt',
-    'all-branches-completed': 'Alle Bereiche fertig', timeout: 'Timeout', completed: 'Abgeschlossen' };
+    'all-branches-completed': 'Alle Bereiche fertig',
+    timeout: 'Timeout', completed: 'Abgeschlossen',
+  };
 
   const timeline = instance.history.map(h => `
     <div class="timeline-item">
-      <div class="tl-dot"></div>
+      <div class="tl-dot ${h.action === 'question' ? 'tl-dot-question' : h.action === 'answered' ? 'tl-dot-answered' : ''}"></div>
       <div class="tl-content">
         <div class="tl-actor">
           ${h.actor}
@@ -288,6 +317,9 @@ function renderInstance(user, instance, wf) {
     dataRows,
     timeline,
     canDecide,
+    canQuestion,
+    canAnswer,
+    questionText:    lastQuestion?.note || '',
     instanceId:      instance.id,
   });
 

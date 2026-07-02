@@ -1,27 +1,42 @@
 {
   "id": "km-logging",
   "name": "Kilometerstand erfassen",
-  "description": "Erfasse Kilometerstände für Fahrzeuge",
+  "description": "Kilometerstand für Firmenfahrzeuge erfassen und bestätigen lassen",
   "icon": "🚘",
   "submitLabel": "Absenden",
-  "roles": ["manager", "employee", "hr", "admin"],
-
-  "form": {
-    "hint": "Wird automatisch aus dem Bewerbungsprozess befüllt — oder manuell starten",
-    "fields": [
-      { "id": "employee_name",  "label": "Name des Mitarbeiters", "type": "text", "required": true  },
-      { "id": "employee_email", "label": "Private E-Mail",        "type": "text", "required": true  },
-      { "id": "position",       "label": "Position / Stelle",     "type": "text", "required": true  },
-      { "id": "department",     "label": "Abteilung",             "type": "text", "required": true  },
-      { "id": "start_date",     "label": "Startdatum",            "type": "date", "required": true  },
-      { "id": "application_id", "label": "Bewerbungs-ID",         "type": "text", "required": false }
-    ]
-  },
-
+  "roles": [
+    "manager",
+    "employee",
+    "hr",
+    "admin"
+  ],
   "steps": [
-    { "id": "submit",       "type": "form",     "actor": "submitter", "onApprove": "hr-approval" },
-    { "id": "hr-approval",  "type": "approval",  "actor": "hr",        "onApprove": "notify-complete", "onReject": "notify-rejected" },
-    { "id": "notify-complete", "type": "action", "actor": "system",    "action": "notify-complete", "onApprove": "done" },
-    { "id": "notify-rejected", "type": "action", "actor": "system",    "action": "notify-rejected", "onApprove": "done" }
+    {
+      "id": "submit",
+      "type": "form",
+      "actor": "submitter",
+      "onApprove": "hr-approval"
+    },
+    {
+      "id": "hr-approval",
+      "type": "approval",
+      "actor": "hr",
+      "onApprove": "notify-complete",
+      "onReject": "notify-rejected"
+    },
+    {
+      "id": "notify-complete",
+      "type": "action",
+      "actor": "system",
+      "action": "notify-complete",
+      "onApprove": "done"
+    },
+    {
+      "id": "notify-rejected",
+      "type": "action",
+      "actor": "system",
+      "action": "notify-rejected",
+      "onApprove": "done"
+    }
   ]
 }

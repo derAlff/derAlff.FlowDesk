@@ -30,9 +30,9 @@
   --blue-bg:     #eff6ff;
   --nav-h:       68px;
   --max-w:       1100px;
-  --radius:      6px;
-  --radius-sm:   4px;
-  --radius-lg:   10px;
+  --radius:      3px;
+  --radius-sm:   2px;
+  --radius-lg:   4px;
   --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow:      0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
   --shadow-lg:   0 12px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
@@ -559,14 +559,6 @@ tbody tr:hover { background: var(--bg); }
 
 /* ── FORMS ────────────────────────────────────────────────────────── */
 
-/*.form-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 32px 36px;
-  max-width: 600px;
-}*/
 .form-card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -574,7 +566,6 @@ tbody tr:hover { background: var(--bg); }
   box-shadow: var(--shadow-sm);
   padding: 32px 36px;
   max-width: 600px;
-  margin: 0 auto;
 }
 
 .form-group { margin-bottom: 22px; }
@@ -921,3 +912,58 @@ hr {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* ── QUESTION / RÜCKFRAGE ─────────────────────────────────────────── */
+
+.btn-question {
+  background: var(--white);
+  color: #6b21a8;
+  border: 1.5px solid #d8b4fe;
+  box-shadow: 0 2px 6px rgba(107,33,168,0.1);
+}
+.btn-question:hover {
+  background: #faf5ff;
+  border-color: #a855f7;
+  color: #6b21a8;
+}
+
+.alert-question {
+  display: flex;
+  gap: 16px;
+  background: #faf5ff;
+  border: 1.5px solid #d8b4fe;
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  animation: fadeIn 0.3s ease;
+}
+
+.alert-question-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.alert-question-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b21a8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.alert-question-text {
+  font-size: 15px;
+  color: #3b0764;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.tl-action-question  { background: #faf5ff; color: #6b21a8; }
+.tl-action-answered  { background: #f0fdf4; color: var(--green); }
+
+.tl-dot-question  { background: #faf5ff; border-color: #a855f7; }
+.tl-dot-question::after  { background: #a855f7; }
+.tl-dot-answered  { background: var(--green-bg); border-color: var(--green); }
+.tl-dot-answered::after  { background: var(--green); }

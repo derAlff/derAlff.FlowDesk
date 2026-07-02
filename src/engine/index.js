@@ -148,7 +148,7 @@ const engine = {
     return instance;
   },
 
-  // Manuelle Entscheidung (approve/reject) für approval-Steps
+  // Manuelle Entscheidung (approve/reject/question) für approval-Steps
   decide(instanceId, actor, action, note = '') {
     const instance = db.findOne('instances', { id: instanceId });
     if (!instance) throw new Error('Instanz nicht gefunden');
@@ -161,8 +161,40 @@ const engine = {
 
     logHistory(instance, currentStep.id, actor.username, action, note);
 
-    const nextStepId = action === 'approve' ? currentStep.onApprove : currentStep.onReject;
-    this._advance(wf, instance, nextStepId, action);
+    if (action === 'question') {
+      // Rückfrage: Merken wohin wir danach zurückkehren
+      instance._questionReturn = currentStep.id;
+      const nextStepId = currentStep.onQuestion;
+      if (!nextStepId) throw new Error(`Step "${currentStep.id}" hat kein onQuestion definiert`);
+      this._advance(wf, instance, nextStepId, 'question');
+    } else {
+      const nextStepId = action === 'approve' ? currentStep.onApprove : currentStep.onReject;
+      this._advance(wf, instance, nextStepId, action);
+    }
+
+    instance.updatedAt = dayjs().toISOString();
+    db.update('instances', { id: instanceId }, instance);
+    return instance;
+  },
+
+  // Antragsteller beantwortet eine Rückfrage
+  answer(instanceId, actor, answerText) {
+    const instance = db.findOne('instances', { id: instanceId });
+    if (!instance) throw new Error('Instanz nicht gefunden');
+    if (instance.status !== 'running') throw new Error('Instanz ist nicht aktiv');
+
+    const wf          = WORKFLOWS[instance.workflowId];
+    const currentStep = wf.steps.find(s => s.id === instance.currentStep);
+    if (!currentStep || currentStep.type !== 'question')
+      throw new Error('Aktueller Schritt ist keine Rückfrage');
+
+    logHistory(instance, currentStep.id, actor.username, 'answered', answerText);
+
+    // Zurück zum ursprünglichen Approval-Step
+    const returnStepId = instance._questionReturn;
+    delete instance._questionReturn;
+
+    this._advance(wf, instance, returnStepId, 'approve');
 
     instance.updatedAt = dayjs().toISOString();
     db.update('instances', { id: instanceId }, instance);
@@ -249,6 +281,11 @@ const engine = {
           console.log(`[Engine] Timeout gesetzt für Step "${step.id}": ${expireAt}`);
         }
         // Wartet auf decide() — nichts tun
+        break;
+
+      case 'question':
+        // Wartet auf answer() vom Antragsteller — nichts tun
+        console.log(`[Engine] Rückfrage aktiv bei Instanz ${instance.id} — wartet auf Antwort von ${instance.submitter}`);
         break;
 
       case 'condition':

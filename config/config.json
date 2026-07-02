@@ -11,65 +11,56 @@
     "phone": "+352 326401",
     "email": "info@alphabau.lu"
   },
-
   "theme": {
     "mode": "light",
-
     "colors": {
-      "bg":         "#f4f4f2",
-      "surface":    "#ffffff",
-      "surface2":   "#f0ede8",
-      "border":     "#ddd9d0",
-      "accent":     "#F5A800",
-      "accentDim":  "#fff3cc",
+      "bg": "#f4f4f2",
+      "surface": "#ffffff",
+      "surface2": "#f0ede8",
+      "border": "#ddd9d0",
+      "accent": "#F5A800",
+      "accentDim": "#fff3cc",
       "accentText": "#1a1a1a",
-      "text":       "#1a1a1a",
-      "muted":      "#6b6560",
-      "green":      "#2d8a4e",
-      "red":        "#c0392b",
-      "yellow":     "#F5A800"
+      "text": "#1a1a1a",
+      "muted": "#6b6560",
+      "green": "#2d8a4e",
+      "red": "#c0392b",
+      "yellow": "#F5A800"
     },
-
     "font": {
       "family": "'Inter', 'Helvetica Neue', Arial, sans-serif",
-      "size":   "15px"
+      "size": "15px"
     },
-
     "nav": {
-      "height":    "64px",
+      "height": "64px",
       "logoStyle": "image"
     },
-
     "borderRadius": {
-      "card":   "4px",
+      "card": "4px",
       "button": "3px",
-      "input":  "3px"
+      "input": "3px"
     }
   },
-
   "app": {
-    "title":        "AlphaBau Portal",
-    "subtitle":     "Internes Prozessmanagement",
-    "welcomeText":  "Willkommen",
-    "language":     "de",
-    "dateFormat":   "DD.MM.YYYY",
-    "timeFormat":   "HH:mm",
-    "timezone":     "Europe/Luxembourg"
+    "title": "AlphaBau Portal",
+    "subtitle": "Internes Prozessmanagement",
+    "welcomeText": "Willkommen",
+    "language": "de",
+    "dateFormat": "DD.MM.YYYY",
+    "timeFormat": "HH:mm",
+    "timezone": "Europe/Luxembourg"
   },
-
   "features": {
-    "darkMode":         false,
-    "emailSimulator":   true,
-    "imapPoller":       true,
+    "darkMode": false,
+    "emailSimulator": true,
+    "imapPoller": true,
     "timeoutScheduler": true,
-    "auditLog":         true
+    "auditLog": true
   },
-
   "login": {
-    "showDemoHint":    true,
-    
+    "showDemoHint": true,
     "backgroundImage": "https://alphabau.lu/wp-content/uploads/2024/08/Mercedes-Benz-Unimog-U1450-DoKa-400x300.jpg",
-    "welcomeMessage":  "AlphaBau Mitarbeiterportal",
-    "logoVisible":     true
+    "welcomeMessage": "AlphaBau Mitarbeiterportal",
+    "logoVisible": true
   }
 }
